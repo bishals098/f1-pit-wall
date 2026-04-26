@@ -1981,6 +1981,48 @@ body {
 })();
 
 
+</script>
+
+<!-- ── Race Result Modal ────────────────────────── -->
+<div class="rmodal-overlay" id="raceModal" role="dialog" aria-modal="true" aria-labelledby="rmodalTitle">
+  <div class="rmodal">
+    <div class="rmodal-header">
+      <div class="rmodal-title-wrap">
+        <span class="rmodal-flag" id="rmodalFlag">🏁</span>
+        <div>
+          <div class="rmodal-title" id="rmodalTitle">Race Results</div>
+          <div class="rmodal-subtitle" id="rmodalSubtitle">F1 2026</div>
+        </div>
+      </div>
+      <button class="rmodal-close" id="rmodalClose" aria-label="Close race stats">✕</button>
+    </div>
+    <div class="rmodal-body">
+      <div class="rmodal-col">
+        <div class="rmodal-col-title">§ RACE CLASSIFICATION · TOP 10</div>
+        <div id="rmodalDrivers">
+          <div class="rmod-skeleton"></div>
+          <div class="rmod-skeleton"></div>
+          <div class="rmod-skeleton"></div>
+          <div class="rmod-skeleton"></div>
+          <div class="rmod-skeleton"></div>
+        </div>
+      </div>
+      <div class="rmodal-col">
+        <div class="rmodal-col-title">§ CONSTRUCTOR POINTS · THIS RACE</div>
+        <div id="rmodalCons">
+          <div class="rmod-skeleton"></div>
+          <div class="rmod-skeleton"></div>
+          <div class="rmod-skeleton"></div>
+          <div class="rmod-skeleton"></div>
+          <div class="rmod-skeleton"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Race Modal Script (must run AFTER modal HTML) ── -->
+<script>
 /* ── Race Result Modal JS ──────────────────────────────
    Fetches race results from Jolpica on cal-round.done click
    ──────────────────────────────────────────────────── */
@@ -2110,43 +2152,5 @@ body {
 })();
 
 </script>
-
-<!-- ── Race Result Modal ────────────────────────── -->
-<div class="rmodal-overlay" id="raceModal" role="dialog" aria-modal="true" aria-labelledby="rmodalTitle">
-  <div class="rmodal">
-    <div class="rmodal-header">
-      <div class="rmodal-title-wrap">
-        <span class="rmodal-flag" id="rmodalFlag">🏁</span>
-        <div>
-          <div class="rmodal-title" id="rmodalTitle">Race Results</div>
-          <div class="rmodal-subtitle" id="rmodalSubtitle">F1 2026</div>
-        </div>
-      </div>
-      <button class="rmodal-close" id="rmodalClose" aria-label="Close race stats">✕</button>
-    </div>
-    <div class="rmodal-body">
-      <div class="rmodal-col">
-        <div class="rmodal-col-title">§ RACE CLASSIFICATION · TOP 10</div>
-        <div id="rmodalDrivers">
-          <div class="rmod-skeleton"></div>
-          <div class="rmod-skeleton"></div>
-          <div class="rmod-skeleton"></div>
-          <div class="rmod-skeleton"></div>
-          <div class="rmod-skeleton"></div>
-        </div>
-      </div>
-      <div class="rmodal-col">
-        <div class="rmodal-col-title">§ CONSTRUCTOR POINTS · THIS RACE</div>
-        <div id="rmodalCons">
-          <div class="rmod-skeleton"></div>
-          <div class="rmod-skeleton"></div>
-          <div class="rmod-skeleton"></div>
-          <div class="rmod-skeleton"></div>
-          <div class="rmod-skeleton"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 </body>
 </html>
