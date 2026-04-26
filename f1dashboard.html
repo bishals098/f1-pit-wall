@@ -942,6 +942,112 @@ body {
   .driver-pts { font-size: 17px; }
   .cal-flag-name { font-size: 15px; }
 }
+
+/* ── OpenF1 Live Integration ────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+.of1-skeleton {
+  background: linear-gradient(90deg,
+    var(--paper-2) 25%, var(--paper-3) 50%, var(--paper-2) 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  height: 52px;
+  margin: 6px 24px;
+  border-radius: 2px;
+  opacity: 0.75;
+}
+.of1-error {
+  padding: 16px 24px;
+  font-size: 11px;
+  color: var(--ink-3);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: .06em;
+}
+.of1-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  color: var(--racing);
+  background: rgba(225,6,0,0.10);
+  border: 1px solid rgba(225,6,0,0.2);
+  padding: 2px 7px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.of1-badge .live-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--racing);
+  animation: pulseDot 1.8s ease-in-out infinite;
+}
+
+/* ── FanCode Watch Button ───────────────────────────── */
+.fancode-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  padding: 13px 20px;
+  background: transparent;
+  border: 1px solid rgba(225,6,0,0.45);
+  color: var(--paper);
+  text-decoration: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .04em;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+  max-width: 240px;
+}
+.fancode-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--racing);
+  transform: translateX(-100%);
+  transition: transform 0.25s cubic-bezier(0.16,1,0.3,1);
+  z-index: 0;
+}
+.fancode-btn:hover::before { transform: translateX(0); }
+.fancode-btn:hover { border-color: var(--racing); }
+.fancode-icon {
+  font-size: 10px;
+  color: var(--racing);
+  transition: color 0.2s ease;
+  position: relative;
+  z-index: 1;
+}
+.fancode-btn:hover .fancode-icon { color: #fff; }
+.fancode-text {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+  color: rgba(242,236,224,0.85);
+  transition: color 0.2s ease;
+}
+.fancode-btn:hover .fancode-text { color: #fff; }
+.fancode-text strong { color: var(--paper); font-weight: 700; }
+.fancode-btn:hover .fancode-text strong { color: #fff; }
+.fancode-arrow {
+  font-size: 13px;
+  color: var(--racing);
+  position: relative;
+  z-index: 1;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+.fancode-btn:hover .fancode-arrow { transform: translateX(4px); color: #fff; }
+@media (max-width: 768px) {
+  .fancode-btn { max-width: 100%; margin-top: 18px; }
+}
 </style>
 </head>
 <body>
@@ -985,37 +1091,42 @@ body {
     <div class="race-grid">
       <div class="race-left">
         <div class="race-meta-row">
-          <span class="race-round">◆ Round 04 · Up Next</span>
-          <span class="race-flag-big">🇺🇸</span>
+          <span class="race-round" id="next-round">◆ Round 04 · Up Next</span>
+          <span class="race-flag-big" id="next-flag">🇺🇸</span>
         </div>
-        <h2 class="race-name">Miami <em>Grand Prix</em></h2>
-        <div class="race-circuit"><strong>Miami International Autodrome</strong> · Hard Rock Stadium</div>
-        <div class="race-circuit">Round 4 of 23 · 57 laps · 308.326 km</div>
+        <h2 class="race-name" id="next-name">Miami <em>Grand Prix</em></h2>
+        <div class="race-circuit" id="next-circuit"><strong>Miami International Autodrome</strong> · Hard Rock Stadium</div>
+        <div class="race-circuit" id="next-circuit-2">Round 4 of 23 · 57 laps · 308.326 km</div>
 
         <div class="race-stats">
           <div class="race-stat">
             <div class="race-stat-label">Lap Record</div>
-            <div class="race-stat-val">1:29.708</div>
+            <div class="race-stat-val" id="next-lap-record">1:29.708</div>
           </div>
           <div class="race-stat">
             <div class="race-stat-label">Pole 2025</div>
-            <div class="race-stat-val">M. Verstappen</div>
+            <div class="race-stat-val" id="next-pole">M. Verstappen</div>
           </div>
           <div class="race-stat">
             <div class="race-stat-label">Dates</div>
-            <div class="race-stat-val">May 1 – 3</div>
+            <div class="race-stat-val" id="next-dates">May 1 – 3</div>
           </div>
         </div>
       </div>
 
       <div class="race-right">
-        <div class="countdown-label">Lights Out In</div>
+        <div class="countdown-label" id="next-countdown-label">Lights Out In</div>
         <div class="countdown">
           <div class="cd-cell"><div class="cd-num" id="cd-d">00</div><div class="cd-label">Days</div></div>
           <div class="cd-cell"><div class="cd-num" id="cd-h">00</div><div class="cd-label">Hours</div></div>
           <div class="cd-cell"><div class="cd-num" id="cd-m">00</div><div class="cd-label">Mins</div></div>
           <div class="cd-cell"><div class="cd-num" id="cd-s">00</div><div class="cd-label">Secs</div></div>
         </div>
+        <a class="fancode-btn" href="https://www.fancode.com/formula1" target="_blank" rel="noopener noreferrer">
+          <span class="fancode-icon">▶</span>
+          <span class="fancode-text">Watch on <strong>FanCode</strong></span>
+          <span class="fancode-arrow">→</span>
+        </a>
       </div>
     </div>
   </div>
@@ -1065,58 +1176,20 @@ body {
       <div class="col-head">
         <div class="col-num">§ 01</div>
         <div class="col-name">Drivers' <em>Championship</em></div>
-        <div class="col-sub">Top 10 · After 3 Rounds</div>
+        <div class="col-sub" id="drivers-sub">Top 10 · Live<span class="of1-badge"><span class="live-dot"></span>OPENF1</span></div>
       </div>
 
-      <div class="driver-row leader" style="--team-color: var(--mercedes); animation-delay:4.5s;">
-        <div class="driver-pos">01</div>
-        <div class="driver-info"><div class="driver-line"><span class="driver-name">K. Antonelli</span><span class="driver-code" style="background:var(--mercedes); color:#000;">ANT</span></div><div class="driver-team">Mercedes · ITA</div></div>
-        <div class="driver-pts-wrap"><div class="driver-pts">72</div><div class="driver-pts-sub">pts</div></div>
-      </div>
-      <div class="driver-row" style="--team-color: var(--mercedes); animation-delay:4.58s;">
-        <div class="driver-pos">02</div>
-        <div class="driver-info"><div class="driver-line"><span class="driver-name">G. Russell</span><span class="driver-code" style="background:var(--mercedes); color:#000;">RUS</span></div><div class="driver-team">Mercedes · GBR · <span class="gap">−9</span></div></div>
-        <div class="driver-pts-wrap"><div class="driver-pts">63</div><div class="driver-pts-sub">pts</div></div>
-      </div>
-      <div class="driver-row" style="--team-color: var(--ferrari); animation-delay:4.66s;">
-        <div class="driver-pos">03</div>
-        <div class="driver-info"><div class="driver-line"><span class="driver-name">C. Leclerc</span><span class="driver-code" style="background:var(--ferrari);">LEC</span></div><div class="driver-team">Ferrari · MON · <span class="gap">−23</span></div></div>
-        <div class="driver-pts-wrap"><div class="driver-pts">49</div><div class="driver-pts-sub">pts</div></div>
-      </div>
-      <div class="driver-row fav" style="--team-color: var(--ferrari); animation-delay:4.74s;">
-        <div class="driver-pos">04</div>
-        <div class="driver-info"><div class="driver-line"><span class="driver-name">L. Hamilton</span><span class="driver-code" style="background:var(--ferrari);">HAM</span></div><div class="driver-team">Ferrari · GBR · <span class="gap">−31</span></div></div>
-        <div class="driver-pts-wrap"><div class="driver-pts">41</div><div class="driver-pts-sub">pts</div></div>
-      </div>
-      <div class="driver-row" style="--team-color: var(--mclaren); animation-delay:4.82s;">
-        <div class="driver-pos">05</div>
-        <div class="driver-info"><div class="driver-line"><span class="driver-name">L. Norris</span><span class="driver-code" style="background:var(--mclaren);">NOR</span></div><div class="driver-team">McLaren · GBR · <span class="gap">−47</span></div></div>
-        <div class="driver-pts-wrap"><div class="driver-pts">25</div><div class="driver-pts-sub">pts</div></div>
-      </div>
-      <div class="driver-row" style="--team-color: var(--mclaren); animation-delay:4.90s;">
-        <div class="driver-pos">06</div>
-        <div class="driver-info"><div class="driver-line"><span class="driver-name">O. Piastri</span><span class="driver-code" style="background:var(--mclaren);">PIA</span></div><div class="driver-team">McLaren · AUS · <span class="gap">−51</span></div></div>
-        <div class="driver-pts-wrap"><div class="driver-pts">21</div><div class="driver-pts-sub">pts</div></div>
-      </div>
-      <div class="driver-row" style="--team-color: var(--haas); animation-delay:4.98s;">
-        <div class="driver-pos">07</div>
-        <div class="driver-info"><div class="driver-line"><span class="driver-name">O. Bearman</span><span class="driver-code" style="background:#4a4a4a;">BEA</span></div><div class="driver-team">Haas · GBR · <span class="gap">−55</span></div></div>
-        <div class="driver-pts-wrap"><div class="driver-pts">17</div><div class="driver-pts-sub">pts</div></div>
-      </div>
-      <div class="driver-row" style="--team-color: var(--alpine); animation-delay:5.06s;">
-        <div class="driver-pos">08</div>
-        <div class="driver-info"><div class="driver-line"><span class="driver-name">P. Gasly</span><span class="driver-code" style="background:var(--alpine);">GAS</span></div><div class="driver-team">Alpine · FRA · <span class="gap">−57</span></div></div>
-        <div class="driver-pts-wrap"><div class="driver-pts">15</div><div class="driver-pts-sub">pts</div></div>
-      </div>
-      <div class="driver-row" style="--team-color: var(--redbull); animation-delay:5.14s;">
-        <div class="driver-pos">09</div>
-        <div class="driver-info"><div class="driver-line"><span class="driver-name">M. Verstappen</span><span class="driver-code" style="background:var(--redbull);">VER</span></div><div class="driver-team">Red Bull · NED · <span class="gap">−60</span></div></div>
-        <div class="driver-pts-wrap"><div class="driver-pts">12</div><div class="driver-pts-sub">pts</div></div>
-      </div>
-      <div class="driver-row" style="--team-color: var(--racingbulls); animation-delay:5.22s;">
-        <div class="driver-pos">10</div>
-        <div class="driver-info"><div class="driver-line"><span class="driver-name">L. Lawson</span><span class="driver-code" style="background:var(--racingbulls);">LAW</span></div><div class="driver-team">Racing Bulls · NZL · <span class="gap">−62</span></div></div>
-        <div class="driver-pts-wrap"><div class="driver-pts">10</div><div class="driver-pts-sub">pts</div></div>
+      <div id="drivers-list">
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
       </div>
     </div>
 
@@ -1124,52 +1197,21 @@ body {
       <div class="col-head">
         <div class="col-num">§ 02</div>
         <div class="col-name">Constructors' <em>Cup</em></div>
-        <div class="col-sub">All 11 teams · 2026</div>
+        <div class="col-sub">All teams · Live<span class="of1-badge"><span class="live-dot"></span>OPENF1</span></div>
       </div>
 
-      <div class="con-row fav" style="--team-color: var(--mercedes); animation-delay:4.5s;">
-        <div class="con-top"><div class="con-pos">01</div><div><div class="con-name">Mercedes-AMG</div><div class="con-engine">Mercedes PU · DEU</div></div><div class="con-pts">135</div></div>
-        <div class="con-bar"><div class="con-bar-fill" style="width:100%; animation-delay:5.5s;"></div></div>
-      </div>
-      <div class="con-row" style="--team-color: var(--ferrari); animation-delay:4.58s;">
-        <div class="con-top"><div class="con-pos">02</div><div><div class="con-name">Scuderia Ferrari</div><div class="con-engine">Ferrari PU · ITA</div></div><div class="con-pts">90</div></div>
-        <div class="con-bar"><div class="con-bar-fill" style="width:66%; animation-delay:5.55s;"></div></div>
-      </div>
-      <div class="con-row" style="--team-color: var(--mclaren); animation-delay:4.66s;">
-        <div class="con-top"><div class="con-pos">03</div><div><div class="con-name">McLaren</div><div class="con-engine">Mercedes PU · GBR</div></div><div class="con-pts">46</div></div>
-        <div class="con-bar"><div class="con-bar-fill" style="width:34%; animation-delay:5.6s;"></div></div>
-      </div>
-      <div class="con-row" style="--team-color: var(--haas); animation-delay:4.74s;">
-        <div class="con-top"><div class="con-pos">04</div><div><div class="con-name">Haas F1</div><div class="con-engine">Ferrari PU · USA</div></div><div class="con-pts">18</div></div>
-        <div class="con-bar"><div class="con-bar-fill" style="width:13%; animation-delay:5.65s;"></div></div>
-      </div>
-      <div class="con-row" style="--team-color: var(--redbull); animation-delay:4.82s;">
-        <div class="con-top"><div class="con-pos">05</div><div><div class="con-name">Red Bull Racing</div><div class="con-engine">Red Bull Ford · AUT</div></div><div class="con-pts">16</div></div>
-        <div class="con-bar"><div class="con-bar-fill" style="width:12%; animation-delay:5.7s;"></div></div>
-      </div>
-      <div class="con-row" style="--team-color: var(--alpine); animation-delay:4.90s;">
-        <div class="con-top"><div class="con-pos">06</div><div><div class="con-name">Alpine</div><div class="con-engine">Mercedes PU · FRA</div></div><div class="con-pts">16</div></div>
-        <div class="con-bar"><div class="con-bar-fill" style="width:12%; animation-delay:5.75s;"></div></div>
-      </div>
-      <div class="con-row" style="--team-color: var(--racingbulls); animation-delay:4.98s;">
-        <div class="con-top"><div class="con-pos">07</div><div><div class="con-name">Racing Bulls</div><div class="con-engine">Red Bull Ford · ITA</div></div><div class="con-pts">14</div></div>
-        <div class="con-bar"><div class="con-bar-fill" style="width:10%; animation-delay:5.8s;"></div></div>
-      </div>
-      <div class="con-row" style="--team-color: var(--audi); animation-delay:5.06s;">
-        <div class="con-top"><div class="con-pos">08</div><div><div class="con-name">Audi</div><div class="con-engine">Audi PU · DEU</div></div><div class="con-pts">2</div></div>
-        <div class="con-bar"><div class="con-bar-fill" style="width:2%; animation-delay:5.85s;"></div></div>
-      </div>
-      <div class="con-row" style="--team-color: var(--williams); animation-delay:5.14s;">
-        <div class="con-top"><div class="con-pos">09</div><div><div class="con-name">Williams</div><div class="con-engine">Mercedes PU · GBR</div></div><div class="con-pts">2</div></div>
-        <div class="con-bar"><div class="con-bar-fill" style="width:2%; animation-delay:5.9s;"></div></div>
-      </div>
-      <div class="con-row" style="--team-color: var(--aston); animation-delay:5.22s;">
-        <div class="con-top"><div class="con-pos">10</div><div><div class="con-name">Aston Martin</div><div class="con-engine">Honda PU · GBR</div></div><div class="con-pts">0</div></div>
-        <div class="con-bar"><div class="con-bar-fill" style="width:0%;"></div></div>
-      </div>
-      <div class="con-row" style="--team-color: var(--cadillac); animation-delay:5.30s;">
-        <div class="con-top"><div class="con-pos">11</div><div><div class="con-name">Cadillac</div><div class="con-engine">Ferrari PU · USA · NEW</div></div><div class="con-pts">0</div></div>
-        <div class="con-bar"><div class="con-bar-fill" style="width:0%;"></div></div>
+      <div id="constructors-list">
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
       </div>
     </div>
 
@@ -1177,28 +1219,14 @@ body {
       <div class="col-head">
         <div class="col-num">§ 03</div>
         <div class="col-name">Paddock <em>Intel</em></div>
-        <div class="col-sub">Last Race · Top Stories</div>
+        <div class="col-sub">Last Race <span class="of1-badge"><span class="live-dot"></span>OPENF1</span> · Top Stories</div>
       </div>
 
-      <div class="podium-block">
-        <div class="podium-head">Japanese GP · Suzuka · Result</div>
-        <div class="podium-list">
-          <div class="pod-row p1">
-            <div class="pod-badge">P1</div>
-            <div><div class="pod-driver-name">Kimi Antonelli</div><div class="pod-driver-team">Mercedes · #12</div></div>
-            <div class="pod-time">1:28:14.802</div>
-          </div>
-          <div class="pod-row p2">
-            <div class="pod-badge">P2</div>
-            <div><div class="pod-driver-name">George Russell</div><div class="pod-driver-team">Mercedes · #63</div></div>
-            <div class="pod-time">+3.441</div>
-          </div>
-          <div class="pod-row p3">
-            <div class="pod-badge">P3</div>
-            <div><div class="pod-driver-name">Charles Leclerc</div><div class="pod-driver-team">Ferrari · #16</div></div>
-            <div class="pod-time">+9.127</div>
-          </div>
-        </div>
+      <div id="podium-result">
+        <div class="of1-skeleton" style="height:36px;margin-bottom:4px;"></div>
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
+        <div class="of1-skeleton"></div>
       </div>
 
       <div class="news-block">
@@ -1230,7 +1258,7 @@ body {
 
 <section class="stats-ribbon">
   <div class="stats-grid">
-    <div class="stat">
+    <div class="stat" id="stat-lead">
       <div class="stat-label">Championship Lead</div>
       <div class="stat-big"><em>+9</em> pts</div>
       <div class="stat-sub">Antonelli over Russell</div>
@@ -1241,7 +1269,7 @@ body {
       <div class="stat-sub">Russell · Japan Q3</div>
     </div>
     <div class="stat">
-      <div class="stat-label">Fastest Pit Stop</div>
+    <div class="stat" id="stat-pit">
       <div class="stat-big">1.94<em>s</em></div>
       <div class="stat-sub">McLaren · Japanese GP</div>
     </div>
@@ -1271,22 +1299,125 @@ body {
   document.getElementById('dateline').textContent = D[now.getDay()] + ' · ' + String(now.getDate()).padStart(2,'0') + ' ' + M[now.getMonth()] + ' · ' + now.getFullYear();
 })();
 
-(function(){
-  const target = new Date('2026-05-03T20:00:00Z').getTime();
-  const pad = (n) => String(n).padStart(2,'0');
-  function tick() {
-    const diff = target - Date.now();
-    if (diff <= 0) {
-      ['cd-d','cd-h','cd-m','cd-s'].forEach(id => document.getElementById(id).textContent = '00');
-      return;
+/* ── Auto-updating Race Hero (Jolpica API) ──────────── */
+(async function loadNextRace() {
+
+  const JOLPICA = 'https://api.jolpi.ca/ergast/f1/2026';
+  const pad = n => String(n).padStart(2,'0');
+
+  // Country code → flag emoji map
+  const FLAGS = {
+    'Australia':'🇦🇺','China':'🇨🇳','Japan':'🇯🇵','Bahrain':'🇧🇭',
+    'Saudi Arabia':'🇸🇦','USA':'🇺🇸','United States':'🇺🇸',
+    'Canada':'🇨🇦','Monaco':'🇲🇨','Spain':'🇪🇸','Austria':'🇦🇹',
+    'UK':'🇬🇧','Great Britain':'🇬🇧','Belgium':'🇧🇪','Hungary':'🇭🇺',
+    'Netherlands':'🇳🇱','Italy':'🇮🇹','Azerbaijan':'🇦🇿',
+    'Singapore':'🇸🇬','Mexico':'🇲🇽','Brazil':'🇧🇷',
+    'Qatar':'🇶🇦','UAE':'🇦🇪','United Arab Emirates':'🇦🇪',
+    'Las Vegas':'🇺🇸','Miami':'🇺🇸','Argentina':'🇦🇷','Portugal':'🇵🇹'
+  };
+
+  // Short month names
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  let countdownTarget = null;
+  let ticker = null;
+
+  function startCountdown(targetMs) {
+    if (ticker) clearInterval(ticker);
+    countdownTarget = targetMs;
+    function tick() {
+      const diff = countdownTarget - Date.now();
+      if (diff <= 0) {
+        ['cd-d','cd-h','cd-m','cd-s'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = '00';
+        });
+        clearInterval(ticker);
+        const lbl = document.getElementById('next-countdown-label');
+        if (lbl) lbl.textContent = 'Lights Out!';
+        return;
+      }
+      const dEl = document.getElementById('cd-d');
+      const hEl = document.getElementById('cd-h');
+      const mEl = document.getElementById('cd-m');
+      const sEl = document.getElementById('cd-s');
+      if (dEl) dEl.textContent = pad(Math.floor(diff / 86400000));
+      if (hEl) hEl.textContent = pad(Math.floor((diff % 86400000) / 3600000));
+      if (mEl) mEl.textContent = pad(Math.floor((diff % 3600000) / 60000));
+      if (sEl) sEl.textContent = pad(Math.floor((diff % 60000) / 1000));
     }
-    document.getElementById('cd-d').textContent = pad(Math.floor(diff / 86400000));
-    document.getElementById('cd-h').textContent = pad(Math.floor((diff % 86400000) / 3600000));
-    document.getElementById('cd-m').textContent = pad(Math.floor((diff % 3600000) / 60000));
-    document.getElementById('cd-s').textContent = pad(Math.floor((diff % 60000) / 1000));
+    tick();
+    ticker = setInterval(tick, 1000);
   }
-  tick();
-  setInterval(tick, 1000);
+
+  // Fallback: keep existing static countdown running immediately
+  startCountdown(new Date('2026-05-03T20:00:00Z').getTime());
+
+  try {
+    // Fetch full 2026 schedule
+    const res = await fetch(`${JOLPICA}/races.json?limit=30`);
+    if (!res.ok) throw new Error('Schedule fetch failed');
+    const data = await res.json();
+    const races = data.MRData.RaceTable.Races;
+
+    // Find the next race that hasn't started yet
+    const now = new Date();
+    const nextRace = races.find(r => {
+      const raceDate = new Date(r.date + 'T' + (r.time || '13:00:00Z'));
+      return raceDate > now;
+    });
+
+    if (!nextRace) return; // season over
+
+    // ── Parse race data ───────────────────────────────────
+    const raceDt   = new Date(nextRace.date + 'T' + (nextRace.time || '13:00:00Z'));
+    const country  = nextRace.Circuit.Location.country;
+    const locality = nextRace.Circuit.Location.locality;
+    const circuit  = nextRace.Circuit.circuitName;
+    const round    = nextRace.round;
+    const raceName = nextRace.raceName;
+    const raceDate = new Date(nextRace.date);
+
+    // Build date range string (Thu FP1 through Sunday race)
+    // Jolpica gives FirstPractice, Qualifying, Race dates
+    let fp1Date = null;
+    if (nextRace.FirstPractice) {
+      fp1Date = new Date(nextRace.FirstPractice.date);
+    }
+    const startD  = fp1Date || new Date(raceDate.getTime() - 2 * 86400000);
+    const dateStr = `${MONTHS[startD.getMonth()]} ${startD.getDate()} – ${MONTHS[raceDate.getMonth()]} ${raceDate.getDate()}`;
+
+    // Split race name: "Miami Grand Prix" → "Miami" + "Grand Prix"
+    const gpIdx   = raceName.indexOf('Grand Prix');
+    const gpLabel = gpIdx > 0 ? raceName.slice(0, gpIdx).trim() : raceName;
+
+    // Flag emoji
+    const flag = FLAGS[country] || FLAGS[locality] || FLAGS[gpLabel] || '🏁';
+
+    // ── Update DOM ────────────────────────────────────────
+    const setEl = (id, html) => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = html;
+    };
+
+    setEl('next-round',  `◆ Round ${pad(parseInt(round))} · Up Next`);
+    setEl('next-flag',   flag);
+    setEl('next-name',   `${gpLabel} <em>Grand Prix</em>`);
+    setEl('next-circuit', `<strong>${circuit}</strong> · ${locality}`);
+    setEl('next-circuit-2', `Round ${round} of ${races.length} · ${country}`);
+    setEl('next-dates',  dateStr);
+    setEl('next-countdown-label', 'Lights Out In');
+
+    // Lap Record and Pole 2025 stay static (not in Jolpica) — no change
+
+    // ── Restart countdown to real race time ───────────────
+    startCountdown(raceDt.getTime());
+
+  } catch(err) {
+    console.warn('[RaceHero] Could not fetch schedule, using fallback:', err);
+    // Fallback countdown already running — nothing to do
+  }
 })();
 
 (function(){
@@ -1314,6 +1445,280 @@ body {
     }
   }, 5000);
 })();
+
+/* ═══════════════════════════════════════════════════════════
+   OpenF1 API Integration — live standings, podium, pit data
+   Base URL: https://api.openf1.org/v1
+   Fallback:  Jolpica (https://api.jolpi.ca/ergast/f1)
+   Hamilton driver number: 44  |  Fav team: mercedes
+   ═══════════════════════════════════════════════════════════ */
+(async function openF1Init() {
+
+  const OF1      = 'https://api.openf1.org/v1';
+  const JOLPICA  = 'https://api.jolpi.ca/ergast/f1/2026';
+  const HAM_NUM  = 44;
+  const FAV_TEAM = 'mercedes';
+
+  const TEAM_META = {
+    'mercedes':      { color:'#27F4D2', textColor:'#000', cssVar:'var(--mercedes)'      },
+    'ferrari':       { color:'#E8002D', textColor:'#fff', cssVar:'var(--ferrari)'        },
+    'mclaren':       { color:'#FF8000', textColor:'#000', cssVar:'var(--mclaren)'        },
+    'red_bull':      { color:'#3671C6', textColor:'#fff', cssVar:'var(--redbull)'        },
+    'williams':      { color:'#64C4FF', textColor:'#000', cssVar:'var(--williams)'       },
+    'haas':          { color:'#B6BABD', textColor:'#000', cssVar:'var(--haas)'           },
+    'alpine':        { color:'#0093CC', textColor:'#fff', cssVar:'var(--alpine)'         },
+    'audi':          { color:'#00877C', textColor:'#fff', cssVar:'var(--audi)'           },
+    'rb':            { color:'#6692FF', textColor:'#fff', cssVar:'var(--racingbulls)'    },
+    'aston_martin':  { color:'#229971', textColor:'#fff', cssVar:'var(--aston)'          },
+    'cadillac':      { color:'#8A9099', textColor:'#fff', cssVar:'var(--cadillac)'       }
+  };
+
+  // Constructor name → ID map for team color lookup
+  const TEAM_NAME_MAP = {
+    'Mercedes': 'mercedes', 'Mercedes-AMG': 'mercedes',
+    'Ferrari': 'ferrari', 'Scuderia Ferrari': 'ferrari',
+    'McLaren': 'mclaren', 'McLaren F1 Team': 'mclaren',
+    'Red Bull Racing': 'red_bull', 'Red Bull': 'red_bull',
+    'Williams': 'williams', 'Williams Racing': 'williams',
+    'Haas F1 Team': 'haas', 'Haas': 'haas',
+    'Alpine': 'alpine', 'Alpine F1 Team': 'alpine',
+    'Audi': 'audi', 'Audi F1 Team': 'audi',
+    'RB': 'rb', 'Racing Bulls': 'rb', 'Visa Cash App RB': 'rb',
+    'Aston Martin': 'aston_martin', 'Aston Martin Aramco': 'aston_martin',
+    'Cadillac': 'cadillac', 'Cadillac F1': 'cadillac'
+  };
+
+  function teamMeta(nameOrId) {
+    const id = TEAM_NAME_MAP[nameOrId] || nameOrId.toLowerCase().replace(/\s+/g,'_');
+    return TEAM_META[id] || { color:'#888', textColor:'#fff', cssVar:'#888' };
+  }
+
+  function skeleton(el, h = 52) {
+    el.innerHTML = [1,2,3,4,5].map(() =>
+      `<div class="of1-skeleton" style="height:${h}px"></div>`).join('');
+  }
+
+  function errMsg(el, msg = 'Could not load data') {
+    el.innerHTML = `<div class="of1-error">⚠ ${msg} — showing last known data</div>`;
+  }
+
+  // Retry fetch with exponential back-off (respects 3 req/s free tier)
+  async function apiFetch(url, retries = 3) {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const r = await fetch(url);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return await r.json();
+      } catch (e) {
+        if (i === retries - 1) throw e;
+        await new Promise(res => setTimeout(res, 800 * (i + 1)));
+      }
+    }
+  }
+
+  // ── Get latest completed Race session ───────────────────────────────
+  async function getLatestRaceSession() {
+    const sessions = await apiFetch(`${OF1}/sessions?year=2026&session_name=Race`);
+    const done = sessions
+      .filter(s => new Date(s.date_end) < new Date())
+      .sort((a, b) => new Date(b.date_end) - new Date(a.date_end));
+    return done[0] || null;
+  }
+
+  // ── Build driver_number → info map ──────────────────────────────────
+  async function getDriverMap(sessionKey) {
+    const drivers = await apiFetch(`${OF1}/drivers?session_key=${sessionKey}`);
+    const map = {};
+    drivers.forEach(d => {
+      map[d.driver_number] = {
+        name:   d.full_name   || `#${d.driver_number}`,
+        code:   d.name_acronym || d.full_name.slice(0,3).toUpperCase(),
+        team:   d.team_name   || '—',
+        teamId: TEAM_NAME_MAP[d.team_name] || 'unknown',
+        number: d.driver_number
+      };
+    });
+    return map;
+  }
+
+  // ── Driver Standings via Jolpica (most reliable for WDC table) ──────
+  async function loadDriverStandings() {
+    const el = document.getElementById('drivers-list');
+    if (!el) return;
+    skeleton(el);
+    try {
+      const data = await apiFetch(`${JOLPICA}/driverstandings.json`);
+      const list = data.MRData.StandingsTable.StandingsLists[0]?.DriverStandings || [];
+      const leaderPts = parseFloat(list[0]?.points || 0);
+      const round = data.MRData.StandingsTable.StandingsLists[0]?.round || '?';
+
+      // Update sub-label with round info
+      const sub = document.getElementById('drivers-sub');
+      if (sub) sub.innerHTML = `After R${round} · Live<span class="of1-badge"><span class="live-dot"></span>OPENF1</span>`;
+
+      el.innerHTML = list.slice(0, 10).map((d, i) => {
+        const meta   = teamMeta(d.Constructors[0]?.constructorId || '');
+        const isFav  = d.Driver.driverId === 'hamilton';
+        const isLead = i === 0;
+        const pts    = parseFloat(d.points);
+        const gap    = isLead ? '' : `· <span class="gap">−${leaderPts - pts}</span>`;
+        return `
+        <div class="driver-row ${isLead ? 'leader' : ''} ${isFav ? 'fav' : ''}"
+             style="--team-color:${meta.color}; animation-delay:${4.5 + i * 0.08}s;">
+          <div class="driver-pos">${String(d.position).padStart(2,'0')}</div>
+          <div class="driver-info">
+            <div class="driver-line">
+              <span class="driver-name">${d.Driver.givenName.charAt(0)}. ${d.Driver.familyName}</span>
+              <span class="driver-code" style="background:${meta.color};color:${meta.textColor}">
+                ${d.Driver.code || d.Driver.familyName.slice(0,3).toUpperCase()}
+              </span>
+            </div>
+            <div class="driver-team">${d.Constructors[0]?.name || '—'} · ${d.Driver.nationality} ${gap}</div>
+          </div>
+          <div class="driver-pts-wrap">
+            <div class="driver-pts">${d.points}</div>
+            <div class="driver-pts-sub">pts</div>
+          </div>
+        </div>`;
+      }).join('');
+    } catch(e) {
+      errMsg(el, 'Driver standings unavailable');
+    }
+  }
+
+  // ── Constructor Standings via Jolpica ───────────────────────────────
+  async function loadConstructorStandings() {
+    const el = document.getElementById('constructors-list');
+    if (!el) return;
+    skeleton(el);
+    try {
+      const data = await apiFetch(`${JOLPICA}/constructorstandings.json`);
+      const list = data.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings || [];
+      const maxPts = parseFloat(list[0]?.points || 1);
+
+      el.innerHTML = list.map((c, i) => {
+        const meta  = teamMeta(c.Constructor.constructorId);
+        const isFav = c.Constructor.constructorId === FAV_TEAM;
+        const pct   = Math.round((parseFloat(c.points) / maxPts) * 100);
+        return `
+        <div class="con-row ${isFav ? 'fav' : ''}"
+             style="--team-color:${meta.color}; animation-delay:${4.5 + i * 0.08}s;">
+          <div class="con-top">
+            <div class="con-pos">${String(c.position).padStart(2,'0')}</div>
+            <div>
+              <div class="con-name">${c.Constructor.name}${isFav ? ' ★' : ''}</div>
+              <div class="con-engine">${c.Constructor.nationality}</div>
+            </div>
+            <div class="con-pts">${c.points}</div>
+          </div>
+          <div class="con-bar">
+            <div class="con-bar-fill" style="width:${pct}%; animation-delay:${5.5 + i * 0.05}s;"></div>
+          </div>
+        </div>`;
+      }).join('');
+    } catch(e) {
+      errMsg(el, 'Constructor standings unavailable');
+    }
+  }
+
+  // ── Podium + Fastest Pit via OpenF1 ────────────────────────────────
+  async function loadPodiumAndPit(session, driverMap) {
+    const podEl  = document.getElementById('podium-result');
+    const pitEl  = document.getElementById('stat-pit');
+    if (!session) { if (podEl) errMsg(podEl, 'No completed race yet'); return; }
+
+    const key = session.session_key;
+
+    try {
+      const [results, pits] = await Promise.all([
+        apiFetch(`${OF1}/session_result?session_key=${key}`),
+        apiFetch(`${OF1}/pit?session_key=${key}`)
+      ]);
+
+      // ── Podium ──────────────────────────────────────────────────────
+      if (podEl) {
+        const top3 = results
+          .filter(r => r.position >= 1 && r.position <= 3)
+          .sort((a, b) => a.position - b.position);
+
+        const badges = ['p1','p2','p3'];
+        podEl.innerHTML = `
+          <div class="podium-head">${session.meeting_name || 'Last Race'} · ${session.location || ''} · Result</div>
+          <div class="podium-list">
+            ${top3.map(r => {
+              const drv = driverMap[r.driver_number] || { name:`#${r.driver_number}`, team:'—' };
+              const time = r.position === 1
+                ? (r.duration || 'WIN')
+                : (r.gap_to_leader ? '+' + r.gap_to_leader : r.is_classified ? '—' : 'DNF');
+              return `
+              <div class="pod-row ${badges[r.position - 1]}">
+                <div class="pod-badge">P${r.position}</div>
+                <div>
+                  <div class="pod-driver-name">${drv.name}</div>
+                  <div class="pod-driver-team">${drv.team} · #${r.driver_number}</div>
+                </div>
+                <div class="pod-time">${time}</div>
+              </div>`;
+            }).join('')}
+          </div>`;
+      }
+
+      // ── Fastest Pit Stop ─────────────────────────────────────────────
+      if (pitEl && pits.length) {
+        const fastest = pits
+          .filter(p => p.pit_duration && p.pit_duration > 0)
+          .sort((a, b) => a.pit_duration - b.pit_duration)[0];
+        if (fastest) {
+          const drv = driverMap[fastest.driver_number] || { team: '—' };
+          pitEl.innerHTML = `
+            <div class="stat-label">Fastest Pit Stop</div>
+            <div class="stat-big">${fastest.pit_duration.toFixed(2)}<em>s</em></div>
+            <div class="stat-sub">${drv.team} · ${session.meeting_name || 'Last Race'}</div>`;
+        }
+      }
+    } catch(e) {
+      if (podEl) errMsg(podEl, 'Race result unavailable');
+    }
+  }
+
+  // ── Championship lead stat via standings data ────────────────────────
+  async function loadChampionshipStat() {
+    const el = document.getElementById('stat-lead');
+    if (!el) return;
+    try {
+      const data = await apiFetch(`${JOLPICA}/driverstandings.json`);
+      const list = data.MRData.StandingsTable.StandingsLists[0]?.DriverStandings || [];
+      if (list.length >= 2) {
+        const lead = parseFloat(list[0].points) - parseFloat(list[1].points);
+        const leader = list[0].Driver.familyName;
+        const second = list[1].Driver.familyName;
+        el.innerHTML = `
+          <div class="stat-label">Championship Lead</div>
+          <div class="stat-big"><em>+${lead}</em> pts</div>
+          <div class="stat-sub">${leader} over ${second}</div>`;
+      }
+    } catch(e) { /* keep static */ }
+  }
+
+  // ── Bootstrap ────────────────────────────────────────────────────────
+  try {
+    // Kick off independent requests in parallel
+    const [session] = await Promise.all([
+      getLatestRaceSession(),
+      loadDriverStandings(),
+      loadConstructorStandings(),
+      loadChampionshipStat()
+    ]);
+
+    if (session) {
+      const driverMap = await getDriverMap(session.session_key);
+      await loadPodiumAndPit(session, driverMap);
+    }
+  } catch(err) {
+    console.warn('[OpenF1] Bootstrap error:', err);
+  }
+})();
+
 </script>
 </body>
 </html>
