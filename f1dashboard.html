@@ -1048,6 +1048,266 @@ body {
 @media (max-width: 768px) {
   .fancode-btn { max-width: 100%; margin-top: 18px; }
 }
+
+/* ── Race Result Modal ──────────────────────────────── */
+.cal-round.done { cursor: pointer; }
+.cal-round.done:hover .cal-country { color: var(--racing); }
+.cal-round.done::after {
+  content: 'TAP FOR STATS';
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: var(--racing);
+  margin-top: 6px;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+.cal-round.done:hover::after { opacity: 1; }
+
+/* Overlay */
+.rmodal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,10,0.88);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.rmodal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Modal box */
+.rmodal {
+  background: var(--carbon-2);
+  border: 1px solid #2e2e2e;
+  border-top: 3px solid var(--racing);
+  width: 100%;
+  max-width: 860px;
+  max-height: 88vh;
+  overflow-y: auto;
+  position: relative;
+  transform: translateY(32px) scale(0.97);
+  transition: transform 0.32s cubic-bezier(0.16,1,0.3,1);
+  scrollbar-width: thin;
+  scrollbar-color: var(--racing) var(--carbon-3);
+}
+.rmodal-overlay.open .rmodal {
+  transform: translateY(0) scale(1);
+}
+
+/* Modal header */
+.rmodal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 28px 18px;
+  border-bottom: 1px solid #2a2a2a;
+  position: sticky;
+  top: 0;
+  background: var(--carbon-2);
+  z-index: 1;
+}
+.rmodal-title-wrap { display: flex; align-items: center; gap: 14px; }
+.rmodal-flag { font-size: 28px; line-height: 1; }
+.rmodal-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--paper);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.rmodal-title em { font-style: italic; color: var(--racing); }
+.rmodal-subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: .16em;
+  color: rgba(242,236,224,0.35);
+  margin-top: 4px;
+}
+.rmodal-close {
+  width: 36px; height: 36px;
+  border: 1px solid #333;
+  background: transparent;
+  color: rgba(242,236,224,0.55);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  flex-shrink: 0;
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+}
+.rmodal-close:hover {
+  background: var(--racing);
+  border-color: var(--racing);
+  color: #fff;
+}
+
+/* Modal body: two-column grid */
+.rmodal-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.rmodal-col {
+  padding: 24px 28px 28px;
+}
+.rmodal-col:first-child {
+  border-right: 1px solid #2a2a2a;
+}
+.rmodal-col-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  color: var(--racing);
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+/* Driver result rows */
+.rmod-driver {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  animation: rowSlide 0.4s cubic-bezier(0.16,1,0.3,1) both;
+}
+.rmod-driver:last-child { border-bottom: none; }
+.rmod-pos {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(242,236,224,0.35);
+  font-variant-numeric: tabular-nums;
+}
+.rmod-pos.p1 { color: var(--gold); }
+.rmod-pos.p2 { color: #b0b8c8; }
+.rmod-pos.p3 { color: #cd7f32; }
+.rmod-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--paper);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.rmod-name.fav-driver { color: var(--mercedes); }
+.rmod-team-tag {
+  font-size: 8px;
+  color: rgba(242,236,224,0.35);
+  margin-top: 2px;
+  font-family: 'Inter', sans-serif;
+}
+.rmod-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(242,236,224,0.6);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+.rmod-time.winner { color: var(--racing); font-weight: 700; }
+.rmod-pts-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--gold);
+  background: rgba(212,160,23,0.12);
+  padding: 1px 6px;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+/* Constructor result rows */
+.rmod-con {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  animation: rowSlide 0.4s cubic-bezier(0.16,1,0.3,1) both;
+}
+.rmod-con:last-child { border-bottom: none; }
+.rmod-con-pos {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(242,236,224,0.35);
+}
+.rmod-con-bar-wrap { margin-top: 5px; }
+.rmod-con-bar {
+  height: 2px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 1px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.rmod-con-bar-fill {
+  height: 100%;
+  background: var(--team-color, var(--racing));
+  transform-origin: left;
+  animation: barGrowSlow 0.6s cubic-bezier(0.16,1,0.3,1) both;
+}
+.rmod-con-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--paper);
+  letter-spacing: -0.01em;
+}
+.rmod-con-pts {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--paper);
+  font-variant-numeric: tabular-nums;
+}
+.rmod-con-pts-label {
+  font-size: 7px;
+  color: rgba(242,236,224,0.35);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: .08em;
+}
+
+/* Loading skeleton inside modal */
+.rmod-skeleton {
+  background: linear-gradient(90deg,
+    var(--carbon-3) 25%, #222 50%, var(--carbon-3) 75%);
+  background-size: 400px 100%;
+  animation: shimmer 1.3s ease-in-out infinite;
+  height: 40px;
+  margin-bottom: 6px;
+  border-radius: 1px;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .rmodal-body { grid-template-columns: 1fr; }
+  .rmodal-col:first-child { border-right: none; border-bottom: 1px solid #2a2a2a; }
+  .rmodal { max-height: 92vh; }
+  .rmodal-title { font-size: 17px; }
+}
 </style>
 </head>
 <body>
@@ -1142,9 +1402,9 @@ body {
     <div class="cal-progress-track"><div class="cal-progress-fill" style="width: 13.6%;"></div></div>
     <div class="cal-strip" id="calStrip">
 
-      <div class="cal-round done"><div class="cal-rnum">R01<span class="cal-status-dot"></span></div><div class="cal-flag-emoji">🇦🇺</div><div class="cal-country">Australia</div><div class="cal-flag-name">Albert Park</div><div class="cal-date">Mar 06–08</div><div class="cal-winner">G. Russell</div></div>
-      <div class="cal-round done"><div class="cal-rnum">R02<span class="cal-status-dot"></span></div><div class="cal-flag-emoji">🇨🇳</div><div class="cal-country">China</div><div class="cal-flag-name">Shanghai</div><div class="cal-date">Mar 13–15</div><div class="cal-winner">K. Antonelli</div></div>
-      <div class="cal-round done"><div class="cal-rnum">R03<span class="cal-status-dot"></span></div><div class="cal-flag-emoji">🇯🇵</div><div class="cal-country">Japan</div><div class="cal-flag-name">Suzuka</div><div class="cal-date">Mar 27–29</div><div class="cal-winner">K. Antonelli</div></div>
+      <div class="cal-round done" data-round="1" data-gp="Australian GP" data-flag="🇦🇺"><div class="cal-rnum">R01<span class="cal-status-dot"></span></div><div class="cal-flag-emoji">🇦🇺</div><div class="cal-country">Australia</div><div class="cal-flag-name">Albert Park</div><div class="cal-date">Mar 06–08</div><div class="cal-winner">G. Russell</div></div>
+      <div class="cal-round done" data-round="2" data-gp="Chinese GP" data-flag="🇨🇳"><div class="cal-rnum">R02<span class="cal-status-dot"></span></div><div class="cal-flag-emoji">🇨🇳</div><div class="cal-country">China</div><div class="cal-flag-name">Shanghai</div><div class="cal-date">Mar 13–15</div><div class="cal-winner">K. Antonelli</div></div>
+      <div class="cal-round done" data-round="3" data-gp="Japanese GP" data-flag="🇯🇵"><div class="cal-rnum">R03<span class="cal-status-dot"></span></div><div class="cal-flag-emoji">🇯🇵</div><div class="cal-country">Japan</div><div class="cal-flag-name">Suzuka</div><div class="cal-date">Mar 27–29</div><div class="cal-winner">K. Antonelli</div></div>
       <div class="cal-round next"><div class="cal-rnum">R04 · NEXT<span class="cal-status-dot"></span></div><div class="cal-flag-emoji">🇺🇸</div><div class="cal-country">USA</div><div class="cal-flag-name">Miami</div><div class="cal-date">May 01–03</div></div>
       <div class="cal-round"><div class="cal-rnum">R05<span class="cal-status-dot"></span></div><div class="cal-flag-emoji">🇨🇦</div><div class="cal-country">Canada</div><div class="cal-flag-name">Montreal</div><div class="cal-date">May 22–24</div></div>
       <div class="cal-round"><div class="cal-rnum">R06<span class="cal-status-dot"></span></div><div class="cal-flag-emoji">🇲🇨</div><div class="cal-country">Monaco</div><div class="cal-flag-name">Monte Carlo</div><div class="cal-date">Jun 05–07</div></div>
@@ -1717,8 +1977,176 @@ body {
   } catch(err) {
     console.warn('[OpenF1] Bootstrap error:', err);
   }
+
+})();
+
+
+/* ── Race Result Modal JS ──────────────────────────────
+   Fetches race results from Jolpica on cal-round.done click
+   ──────────────────────────────────────────────────── */
+(function() {
+
+  const JOLPICA = 'https://api.jolpi.ca/ergast/f1/2026';
+
+  const TEAM_COLORS = {
+    'mercedes':'#27F4D2','ferrari':'#E8002D','mclaren':'#FF8000',
+    'red_bull':'#3671C6','williams':'#64C4FF','haas':'#B6BABD',
+    'alpine':'#0093CC','audi':'#00877C','rb':'#6692FF',
+    'aston_martin':'#229971','cadillac':'#8A9099'
+  };
+
+  const overlay   = document.getElementById('raceModal');
+  const closeBtn  = document.getElementById('rmodalClose');
+  const flagEl    = document.getElementById('rmodalFlag');
+  const titleEl   = document.getElementById('rmodalTitle');
+  const subtitleEl= document.getElementById('rmodalSubtitle');
+  const driversEl = document.getElementById('rmodalDrivers');
+  const consEl    = document.getElementById('rmodalCons');
+
+  const skeletons = n => Array(n).fill('<div class="rmod-skeleton"></div>').join('');
+
+  function openModal()  { overlay.classList.add('open');    document.body.style.overflow = 'hidden'; }
+  function closeModal() { overlay.classList.remove('open'); document.body.style.overflow = ''; }
+
+  closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  async function fetchAndRender(round, gpName, flag) {
+    flagEl.textContent    = flag;
+    titleEl.innerHTML     = gpName.replace('GP', '<em>GP</em>');
+    subtitleEl.textContent= `Round ${round} · 2026 Formula 1 World Championship`;
+    driversEl.innerHTML   = skeletons(10);
+    consEl.innerHTML      = skeletons(6);
+    openModal();
+
+    try {
+      const res  = await fetch(`${JOLPICA}/${round}/results.json`);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const race = data.MRData.RaceTable.Races[0];
+      if (!race) throw new Error('No race data');
+      const results = race.Results;
+
+      /* ── Driver classification ───────────────────────── */
+      driversEl.innerHTML = results.slice(0, 10).map((r, i) => {
+        const pos      = parseInt(r.position);
+        const posClass = pos === 1 ? 'p1' : pos === 2 ? 'p2' : pos === 3 ? 'p3' : '';
+        const isFav    = r.Driver.driverId === 'hamilton';
+        const pts      = parseFloat(r.points);
+        const delay    = i * 0.05;
+        let timeStr;
+        if (pos === 1) {
+          timeStr = r.Time ? r.Time.time : (r.status || 'WIN');
+        } else {
+          timeStr = r.Time ? '+' + r.Time.time : r.status;
+        }
+        return `<div class="rmod-driver" style="animation-delay:${delay}s">
+          <div class="rmod-pos ${posClass}">${String(pos).padStart(2,'0')}</div>
+          <div>
+            <div class="rmod-name ${isFav ? 'fav-driver' : ''}">
+              ${r.Driver.givenName.charAt(0)}. ${r.Driver.familyName}${isFav ? ' ♥' : ''}
+            </div>
+            <div class="rmod-team-tag">${r.Constructor.name}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="rmod-time ${pos === 1 ? 'winner' : ''}">${timeStr}</div>
+            ${pts > 0 ? `<span class="rmod-pts-badge">${pts}pts</span>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+
+      /* ── Constructor points (grouped from driver results) */
+      const conMap = {};
+      results.forEach(r => {
+        const id   = r.Constructor.constructorId;
+        const name = r.Constructor.name;
+        if (!conMap[id]) conMap[id] = { name, pts: 0, id };
+        conMap[id].pts += parseFloat(r.points);
+      });
+      const cons   = Object.values(conMap).filter(c => c.pts > 0).sort((a,b) => b.pts - a.pts);
+      const maxPts = cons[0]?.pts || 1;
+
+      consEl.innerHTML = cons.length ? cons.map((c, i) => {
+        const color = TEAM_COLORS[c.id] || '#888';
+        const pct   = Math.round((c.pts / maxPts) * 100);
+        const fav   = c.id === 'mercedes' ? ' ★' : '';
+        const delay = i * 0.06;
+        return `<div class="rmod-con" style="animation-delay:${delay}s">
+          <div class="rmod-con-pos">${String(i+1).padStart(2,'0')}</div>
+          <div>
+            <div class="rmod-con-name">${c.name}${fav}</div>
+            <div class="rmod-con-bar-wrap">
+              <div class="rmod-con-bar">
+                <div class="rmod-con-bar-fill" style="width:${pct}%;--team-color:${color};animation-delay:${delay+0.2}s;"></div>
+              </div>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div class="rmod-con-pts">${c.pts}</div>
+            <div class="rmod-con-pts-label">PTS</div>
+          </div>
+        </div>`;
+      }).join('') : '<div style="padding:12px;color:rgba(242,236,224,0.3);font-size:10px;font-family:JetBrains Mono,monospace">No constructor points data</div>';
+
+    } catch(err) {
+      driversEl.innerHTML = `<div style="padding:16px;color:rgba(242,236,224,0.4);font-family:JetBrains Mono,monospace;font-size:10px;letter-spacing:.06em">⚠ Could not load race data.<br>Check your connection and try again.</div>`;
+      consEl.innerHTML = '';
+      console.warn('[RaceModal]', err);
+    }
+  }
+
+  /* Attach click handlers to completed rounds */
+  document.querySelectorAll('.cal-round.done[data-round]').forEach(el => {
+    el.addEventListener('click', () => {
+      fetchAndRender(
+        el.getAttribute('data-round'),
+        el.getAttribute('data-gp'),
+        el.getAttribute('data-flag')
+      );
+    });
+  });
+
 })();
 
 </script>
+
+<!-- ── Race Result Modal ────────────────────────── -->
+<div class="rmodal-overlay" id="raceModal" role="dialog" aria-modal="true" aria-labelledby="rmodalTitle">
+  <div class="rmodal">
+    <div class="rmodal-header">
+      <div class="rmodal-title-wrap">
+        <span class="rmodal-flag" id="rmodalFlag">🏁</span>
+        <div>
+          <div class="rmodal-title" id="rmodalTitle">Race Results</div>
+          <div class="rmodal-subtitle" id="rmodalSubtitle">F1 2026</div>
+        </div>
+      </div>
+      <button class="rmodal-close" id="rmodalClose" aria-label="Close race stats">✕</button>
+    </div>
+    <div class="rmodal-body">
+      <div class="rmodal-col">
+        <div class="rmodal-col-title">§ RACE CLASSIFICATION · TOP 10</div>
+        <div id="rmodalDrivers">
+          <div class="rmod-skeleton"></div>
+          <div class="rmod-skeleton"></div>
+          <div class="rmod-skeleton"></div>
+          <div class="rmod-skeleton"></div>
+          <div class="rmod-skeleton"></div>
+        </div>
+      </div>
+      <div class="rmodal-col">
+        <div class="rmodal-col-title">§ CONSTRUCTOR POINTS · THIS RACE</div>
+        <div id="rmodalCons">
+          <div class="rmod-skeleton"></div>
+          <div class="rmod-skeleton"></div>
+          <div class="rmod-skeleton"></div>
+          <div class="rmod-skeleton"></div>
+          <div class="rmod-skeleton"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
