@@ -30,36 +30,6 @@ Live standings · Countdown timer · Race popups · No backend. No database. No 
 | 📺 **FanCode Button** | One-click link to watch live on FanCode |
 | 💅 **Zero Dependencies** | One `.html` file — no npm, no build step, no server |
 
----
-
-## 🖥️ Preview
-
-```
-┌─────────────────────────────────────────────────────────┐
-│  TICKER: WDC · ANTONELLI 72pts  |  WCC · MERCEDES 135  │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│   Bishal's Pit Wall.          Good evening, Bishal      │
-│   ─────────────────           MON · 27 APR · 2026       │
-│                                                         │
-├───────────────────────┬─────────────────────────────────┤
-│  Miami Grand Prix     │  Lights Out In                  │
-│  Round 04 · Up Next   │  06 : 19 : 04 : 32              │
-│  May 1–3              │  [ ▶ Watch on FanCode ]         │
-├───────────┬───────────┴──────────┬──────────────────────┤
-│ § 01      │ § 02                 │ § 03                 │
-│ DRIVERS   │ CONSTRUCTORS         │ PADDOCK INTEL        │
-│ ─────     │ ─────────            │ ────────────         │
-│ 01 ANT 72 │ 01 Mercedes ████▌    │ Japanese GP Podium   │
-│ 02 RUS 61 │ 02 Ferrari  ████     │ P1 Antonelli         │
-│ ...       │ ...                  │ P2 Russell           │
-└───────────┴──────────────────────┴──────────────────────┘
-│  R01 🇦🇺  R02 🇨🇳  R03 🇯🇵  R04 🇺🇸 NEXT  R05 🇨🇦  ...   │
-│  [click done rounds for race stats popup]               │
-└─────────────────────────────────────────────────────────┘
-```
-
----
 
 ## 🚀 Getting Started
 

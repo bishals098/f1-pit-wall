@@ -859,16 +859,42 @@ body {
 .pod-time { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); font-weight: 500; }
 
 .news-block { padding: 0; }
+.news-block { overflow: hidden; position: relative; }
 .news-item {
   padding: 16px 24px;
   border-bottom: 1px solid var(--rule-light);
   position: relative;
-  transition: background 0.2s, padding-left 0.2s;
+  max-height: 180px;
+  overflow: hidden;
+  transition:
+    background 0.2s ease,
+    padding-left 0.2s ease,
+    max-height 0.42s cubic-bezier(0.4,0,0.2,1),
+    padding-top 0.42s cubic-bezier(0.4,0,0.2,1),
+    padding-bottom 0.42s cubic-bezier(0.4,0,0.2,1),
+    opacity 0.32s ease,
+    transform 0.34s cubic-bezier(0.16,1,0.3,1);
 }
 .news-item:last-child { border-bottom: none; }
 .news-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--racing); transition: width 0.25s; }
-.news-item:hover { background: var(--paper-2); padding-left: 28px; }
-.news-item:hover::before { width: 4px; }
+.news-item:not(.news-exit):hover { background: var(--paper-2); padding-left: 28px; }
+.news-item:not(.news-exit):hover::before { width: 4px; }
+/* Slide-out: top item collapses upward */
+.news-item.news-exit {
+  max-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  opacity: 0;
+  transform: translateY(-12px);
+  pointer-events: none;
+  border-bottom: none;
+}
+/* Slide-in: new item eases up from below */
+.news-item.news-enter {
+  opacity: 0;
+  transform: translateY(22px);
+  max-height: 180px;
+}
 
 .news-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; }
 .news-kicker {
@@ -1308,6 +1334,51 @@ body {
   .rmodal { max-height: 92vh; }
   .rmodal-title { font-size: 17px; }
 }
+
+/* ── News LIVE badge ──────────────────────────────── */
+.news-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  color: var(--racing);
+  background: rgba(225,6,0,0.10);
+  border: 1px solid rgba(225,6,0,0.25);
+  padding: 2px 6px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.news-live-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--racing);
+  animation: pulseDot 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+/* ── News progress bar ────────────────────────────── */
+.news-progress-wrap {
+  height: 2px;
+  background: rgba(225,6,0,0.12);
+  overflow: hidden;
+  position: relative;
+}
+.news-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--racing);
+  transform-origin: left;
+  /* filled by JS via transition override */
+  transition: width linear;
+  will-change: width;
+}
+.news-progress-bar.resetting {
+  transition: none;
+  width: 0% !important;
+}
 </style>
 </head>
 <body>
@@ -1479,7 +1550,7 @@ body {
       <div class="col-head">
         <div class="col-num">§ 03</div>
         <div class="col-name">Paddock <em>Intel</em></div>
-        <div class="col-sub">Last Race <span class="of1-badge"><span class="live-dot"></span>OPENF1</span> · Top Stories</div>
+        <div class="col-sub">Last Race <span class="of1-badge"><span class="live-dot"></span>OPENF1</span> · Top Stories <span class="news-live-badge"><span class="news-live-dot"></span>LIVE</span></div>
       </div>
 
       <div id="podium-result">
@@ -1489,28 +1560,8 @@ body {
         <div class="of1-skeleton"></div>
       </div>
 
-      <div class="news-block">
-        <article class="news-item lead">
-          <div class="news-meta"><span class="news-kicker">The Story</span><span class="news-num">01</span></div>
-          <h3 class="news-headline">Antonelli's rookie surge rewrites Mercedes' championship math</h3>
-          <p class="news-body">Three rounds in, the 19-year-old Italian has back-to-back wins and sits atop the drivers' table. Wolff has already shifted team orders mid-weekend. Russell now races his own teammate for the title.</p>
-        </article>
-        <article class="news-item neutral">
-          <div class="news-meta"><span class="news-kicker">Engine Wars</span><span class="news-num">02</span></div>
-          <h3 class="news-headline">Red Bull's new PU is down 15hp to Mercedes, paddock sources say</h3>
-          <p class="news-body">Despite the full Ford works programme, Red Bull's 2026 power unit appears weakest on the grid. Verstappen's P5 in Japan came from chassis, not pace.</p>
-        </article>
-        <article class="news-item neutral">
-          <div class="news-meta"><span class="news-kicker">Debut</span><span class="news-num">03</span></div>
-          <h3 class="news-headline">Cadillac goal is simple: finish races, learn fast, build for 2029</h3>
-          <p class="news-body">GM's eleventh team runs Ferrari PUs until its in-house unit is ready. Herta confirmed for four FP1 outings this year.</p>
-        </article>
-        <article class="news-item">
-          <div class="news-meta"><span class="news-kicker">Calendar</span><span class="news-num">04</span></div>
-          <h3 class="news-headline">FIA confirms Bahrain and Saudi cancellations, no replacements</h3>
-          <p class="news-body">Iran war fallout leaves the season at 23 rounds, Australia to Abu Dhabi. Feeder series affected too.</p>
-        </article>
-      </div>
+      <div class="news-block" id="news-feed"></div>
+      <div class="news-progress-wrap"><div class="news-progress-bar" id="news-progress"></div></div>
     </div>
 
   </div>
@@ -2152,5 +2203,184 @@ body {
 })();
 
 </script>
+
+<!-- ── Paddock Intel: Live Cycling News Feed ── -->
+<script>
+(function () {
+
+  const NEWS = [
+    {
+      kicker: 'The Story', type: 'lead',
+      headline: "Antonelli's rookie surge rewrites Mercedes' championship math",
+      body: "Three rounds in, the 19-year-old Italian has back-to-back wins and sits atop the drivers' table. Wolff has already shifted team orders mid-weekend. Russell now races his own teammate for the title."
+    },
+    {
+      kicker: 'Engine Wars', type: 'neutral',
+      headline: "Red Bull's new PU is down 15hp to Mercedes, paddock sources say",
+      body: "Despite the full Ford works programme, Red Bull's 2026 power unit appears weakest on the grid. Verstappen's P5 in Japan came from chassis, not pace."
+    },
+    {
+      kicker: 'Debut', type: 'neutral',
+      headline: "Cadillac goal is simple: finish races, learn fast, build for 2029",
+      body: "GM's eleventh team runs Ferrari PUs until its in-house unit is ready. Herta confirmed for four FP1 outings this year."
+    },
+    {
+      kicker: 'Calendar', type: '',
+      headline: "FIA confirms Bahrain and Saudi cancellations, no replacements",
+      body: "Iran war fallout leaves the season at 23 rounds, Australia to Abu Dhabi. Feeder series affected too."
+    },
+    {
+      kicker: 'Miami GP', type: 'lead',
+      headline: "Miami round 4: street-circuit heat expected to shake up tyre strategy",
+      body: "Pirelli has brought the C3–C5 compound range. Surface temperatures above 52°C expected Sunday. Undercut window opens as early as lap 18 in race simulations."
+    },
+    {
+      kicker: 'Hamilton', type: 'neutral',
+      headline: "Hamilton's Ferrari form finally surfaces — three consecutive top-six finishes",
+      body: "After a difficult winter integration, the seven-time champion is adapting to Ferrari's 2026 active aero platform. Leclerc's chassis advantage is narrowing."
+    },
+    {
+      kicker: 'Technical', type: '',
+      headline: "FIA clarifies MGU-H reintroduction rules after Red Bull protest",
+      body: "The new 2026 regs brought back kinetic energy recovery in a revised format. Red Bull alleged a breach in Mercedes' deployment mapping but the protest was dismissed with no penalty."
+    },
+    {
+      kicker: 'McLaren', type: 'neutral',
+      headline: "McLaren's race pace deficit traced to floor concept — Norris frustrated",
+      body: "After back-to-back constructors titles, McLaren's 2026 car generates peak qualifying lap times but degrades faster in long runs. A B-spec floor is confirmed for Monaco."
+    },
+    {
+      kicker: 'Russell', type: '',
+      headline: "Russell: 'I\'m not here to play team support — the title is mine to win too'",
+      body: "The British driver refused to yield at Turn 3 in Shanghai, creating the first public tension at Mercedes since 2016. Wolff has publicly backed both drivers — for now."
+    },
+    {
+      kicker: 'Aero Regs', type: 'neutral',
+      headline: "Active aero causing 'sail effect' complaints — three teams request review",
+      body: "Ferrari, Aston Martin and Haas have formally requested the Technical Advisory Committee review active rear wing stall behaviour at high-speed corners above 290 km/h."
+    },
+    {
+      kicker: 'Williams', type: '',
+      headline: "Williams quietly building pace — Albon P7 in Japan, best result in four years",
+      body: "Mercedes power advantage is lifting the Grove team into regular points contention. Their upgraded diffuser in China added 0.22s per lap on long runs per data shared in post-race notes."
+    },
+    {
+      kicker: 'Verstappen', type: 'neutral',
+      headline: "Verstappen eyes Monaco as turning point: 'That track owes us nothing to catch up'",
+      body: "The four-time champion admits the Red Bull package isn't suited to high-speed power circuits. He's focused on street circuits where mechanical grip and downforce can compensate."
+    },
+    {
+      kicker: 'Tyres', type: '',
+      headline: "Pirelli confirms 2027 tyre tender: Bridgestone and Hankook among bidders",
+      body: "Pirelli's current contract runs to end of 2026. The FIA has opened a formal tender for a new exclusive supplier. Bridgestone's return bid is considered the strongest contender."
+    },
+    {
+      kicker: 'Sprints', type: 'neutral',
+      headline: "Sprint format faces axe — GPDA poll shows 80% of drivers prefer elimination",
+      body: "Six sprint weekends remain in 2026 but teams and drivers have petitioned FIA to remove the format entirely from 2027. Bernie Ecclestone-era pressure is cited as the origin of the unpopular format."
+    },
+    {
+      kicker: 'Alpine', type: '',
+      headline: "Alpine's double-diffuser interpretation nets them 0.4s — rivals call it illegal",
+      body: "The French team's latest upgrade package features a diffuser expansion that three rival technical directors believe breaches Article 3.9.2. FIA scrutiny expected at Miami."
+    }
+  ];
+
+  const INTERVAL_MS = 5000;   // ms between each swap
+  const VISIBLE     = 4;
+  const feed        = document.getElementById('news-feed');
+  const bar         = document.getElementById('news-progress');
+  if (!feed) return;
+
+  let pointer = VISIBLE;
+  let cycling = false;
+
+  /* ── Progress bar helpers ─────────────────────────── */
+  function startProgress() {
+    if (!bar) return;
+    // Reset instantly (no transition)
+    bar.classList.add('resetting');
+    bar.style.width = '0%';
+    // Force reflow so the reset takes effect before we start filling
+    bar.getBoundingClientRect();
+    bar.classList.remove('resetting');
+    // Now animate to 100% over the full interval
+    bar.style.transition = 'width ' + (INTERVAL_MS / 1000) + 's linear';
+    bar.style.width = '100%';
+  }
+
+  function flashProgress() {
+    // Briefly flash to signal the swap moment, then reset
+    if (!bar) return;
+    bar.classList.add('resetting');
+    bar.style.width = '0%';
+    bar.getBoundingClientRect();
+    bar.classList.remove('resetting');
+  }
+
+  /* ── Build a news item element ────────────────────── */
+  function makeItem(n, displayNum) {
+    const el = document.createElement('article');
+    el.className = 'news-item' + (n.type ? ' ' + n.type : '');
+    el.innerHTML =
+      '<div class="news-meta">' +
+        '<span class="news-kicker">' + n.kicker + '</span>' +
+        '<span class="news-num">' + String(displayNum).padStart(2,'0') + '</span>' +
+      '</div>' +
+      '<h3 class="news-headline">' + n.headline + '</h3>' +
+      '<p class="news-body">' + n.body + '</p>';
+    return el;
+  }
+
+  /* ── Seed with first 4 items ──────────────────────── */
+  NEWS.slice(0, VISIBLE).forEach(function(n, i) {
+    feed.appendChild(makeItem(n, i + 1));
+  });
+
+  /* ── Start progress bar immediately on load ───────── */
+  // Small delay so the bar transition is visible from the start
+  setTimeout(startProgress, 80);
+
+  /* ── Cycle function ───────────────────────────────── */
+  function cycleNews() {
+    if (cycling) return;
+    cycling = true;
+
+    // Reset the bar at the moment of swap
+    flashProgress();
+
+    const items = feed.querySelectorAll('.news-item:not(.news-exit)');
+    if (!items.length) { cycling = false; return; }
+
+    // Exit top item
+    const top = items[0];
+    top.classList.add('news-exit');
+
+    setTimeout(function() {
+      if (top.parentNode) top.parentNode.removeChild(top);
+
+      // New item enters from bottom
+      const idx    = pointer % NEWS.length;
+      const newEl  = makeItem(NEWS[idx], idx + 1);
+      newEl.classList.add('news-enter');
+      feed.appendChild(newEl);
+
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          newEl.classList.remove('news-enter');
+          pointer++;
+          cycling = false;
+          // Restart progress bar for next cycle
+          startProgress();
+        });
+      });
+    }, 440);
+  }
+
+  setInterval(cycleNews, INTERVAL_MS);
+
+})();
+</script>
+
 </body>
 </html>
