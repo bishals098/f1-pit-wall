@@ -1631,6 +1631,55 @@ body {
   // Short month names
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
+  function updateCalendar(nextRoundNum, racesData) {
+    const cards = Array.from(document.querySelectorAll('.cal-strip .cal-round'));
+    const dotHTML = '<span class="cal-status-dot"></span>';
+
+    cards.forEach((card, idx) => {
+      const roundNum = idx + 1;
+      const race = racesData[idx];
+      const rnumEl = card.querySelector('.cal-rnum');
+
+      card.classList.remove('done', 'next');
+
+      if (roundNum < nextRoundNum) {
+        card.classList.add('done');
+        if (race) {
+          const raceFlag = FLAGS[race.Circuit.Location.country] || FLAGS[race.Circuit.Location.locality] || '🏁';
+          const gpShort = race.raceName.replace('Grand Prix', 'GP').trim();
+          card.setAttribute('data-round', String(roundNum));
+          card.setAttribute('data-gp', gpShort);
+          card.setAttribute('data-flag', raceFlag);
+        }
+        if (rnumEl) rnumEl.innerHTML = `R${pad(roundNum)}${dotHTML}`;
+      } else if (roundNum == nextRoundNum) {
+        card.classList.add('next');
+        card.removeAttribute('data-round');
+        card.removeAttribute('data-gp');
+        card.removeAttribute('data-flag');
+        if (rnumEl) rnumEl.innerHTML = `R${pad(roundNum)} · NEXT${dotHTML}`;
+      } else {
+        card.removeAttribute('data-round');
+        card.removeAttribute('data-gp');
+        card.removeAttribute('data-flag');
+        if (rnumEl) rnumEl.innerHTML = `R${pad(roundNum)}${dotHTML}`;
+      }
+    });
+
+    const fill = document.querySelector('.cal-progress-fill');
+    if (fill && racesData.length) {
+      fill.style.width = (((Math.max(nextRoundNum - 1, 0)) / racesData.length) * 100).toFixed(1) + '%';
+    }
+
+    const meta = document.querySelector('.cal-meta');
+    if (meta) meta.textContent = `${racesData.length} Rounds · Mar → Dec 2026`;
+
+    const nextCard = document.querySelector('.cal-strip .cal-round.next');
+    if (nextCard) {
+      nextCard.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }
+
   let countdownTarget = null;
   let ticker = null;
 
@@ -1719,6 +1768,9 @@ body {
     setEl('next-circuit-2', `Round ${round} of ${races.length} · ${country}`);
     setEl('next-dates',  dateStr);
     setEl('next-countdown-label', 'Lights Out In');
+
+    // Keep the season calendar in sync with the dynamically detected next race
+    updateCalendar(parseInt(round, 10), races);
 
     // Lap Record and Pole 2025 stay static (not in Jolpica) — no change
 
@@ -2189,15 +2241,15 @@ body {
     }
   }
 
-  /* Attach click handlers to completed rounds */
-  document.querySelectorAll('.cal-round.done[data-round]').forEach(el => {
-    el.addEventListener('click', () => {
-      fetchAndRender(
-        el.getAttribute('data-round'),
-        el.getAttribute('data-gp'),
-        el.getAttribute('data-flag')
-      );
-    });
+  /* Delegated click handler so newly-completed rounds work too */
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('.cal-round.done[data-round]');
+    if (!el) return;
+    fetchAndRender(
+      el.getAttribute('data-round'),
+      el.getAttribute('data-gp'),
+      el.getAttribute('data-flag')
+    );
   });
 
 })();
